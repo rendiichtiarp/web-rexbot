@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: Request) {
   try {
-    const { no_user, name, birth_date, whatsapp } = await request.json();
+    const { no_user, name, birth_date } = await request.json();
     
     const connection = await connectDB();
 
@@ -22,7 +22,6 @@ export async function POST(request: Request) {
           birth_date = ?,
           birth_date_time = ?,
           age = ?,
-          whatsapp = ?,
           registered = true,
           updated_at = NOW()
         WHERE no_user = ?`,
@@ -31,7 +30,6 @@ export async function POST(request: Request) {
           birth_date, 
           new Date(birth_date).getTime(),
           new Date().getFullYear() - new Date(birth_date).getFullYear(),
-          whatsapp,
           no_user
         ]
       );
@@ -48,9 +46,9 @@ export async function POST(request: Request) {
     await connection.execute(
       `INSERT INTO users (
         uid, no_user, name, birth_date, birth_date_time, 
-        age, whatsapp, registered, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, true, NOW())`,
-      [uid, no_user, name, birth_date, birthDate.getTime(), age, whatsapp]
+        age, registered, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, true, NOW())`,
+      [uid, no_user, name, birth_date, birthDate.getTime(), age]
     );
     
     await connection.end();
