@@ -47,31 +47,6 @@ export default function PhoneInput({ value, onChange, required = false }: PhoneI
   const handleCountrySelect = (country: typeof countries[0]) => {
     setSelectedCountry(country);
     setIsOpen(false);
-    validateNumber(displayValue, country);
-  };
-
-  const validateNumber = (number: string, country = selectedCountry) => {
-    if (!number) {
-      setError('');
-      return;
-    }
-
-    if (!country.startsWith.includes(number[0])) {
-      setError(`Nomor ${country.name} harus dimulai dengan ${country.startsWith.join(' atau ')}`);
-      return;
-    }
-
-    if (number.length < country.minLength) {
-      setError(`Nomor terlalu pendek (min. ${country.minLength} digit)`);
-      return;
-    }
-
-    if (number.length > country.maxLength) {
-      setError(`Nomor terlalu panjang (maks. ${country.maxLength} digit)`);
-      return;
-    }
-
-    setError('');
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,43 +54,49 @@ export default function PhoneInput({ value, onChange, required = false }: PhoneI
     if (phoneNumber.startsWith('0')) {
       phoneNumber = phoneNumber.substring(1);
     }
-    validateNumber(phoneNumber);
+    
+    // Validasi nomor
+    if (phoneNumber && !selectedCountry.startsWith.includes(phoneNumber[0])) {
+      setError(`Nomor ${selectedCountry.name} harus dimulai dengan ${selectedCountry.startsWith.join(' atau ')}`);
+    } else if (phoneNumber.length > selectedCountry.maxLength) {
+      setError(`Nomor terlalu panjang (maks. ${selectedCountry.maxLength} digit)`);
+    } else {
+      setError('');
+    }
+
     onChange(selectedCountry.dialCode.replace('+', '') + phoneNumber);
   };
 
   const displayValue = value ? value.replace(selectedCountry.dialCode.replace('+', ''), '') : '';
 
   return (
-    <div className="relative space-y-1">
-      <div className="flex">
+    <div className="space-y-1 w-full">
+      <div className="flex w-full">
         {/* Country selector */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             type="button"
-            className="h-full px-3 inline-flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-l-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
+            className="h-[46px] px-3 sm:px-4 inline-flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-l-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
             onClick={() => setIsOpen(!isOpen)}
           >
-            <span>{selectedCountry.dialCode}</span>
+            <span className="text-sm sm:text-base">{selectedCountry.dialCode}</span>
             <ChevronDownIcon className="w-4 h-4" />
           </button>
 
           {/* Dropdown */}
           {isOpen && (
             <div className="absolute z-10 top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-              <ul className="py-2 max-h-48 overflow-auto">
+              <ul className="py-1">
                 {countries.map((country) => (
                   <li key={country.code}>
                     <button
                       type="button"
-                      className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
                       onClick={() => handleCountrySelect(country)}
                     >
-                      <div>
-                        <span className="mr-2">{country.name}</span>
-                        <span className="text-gray-500 dark:text-gray-400">{country.dialCode}</span>
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        Format: {country.format}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">{country.name}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{country.dialCode}</span>
                       </div>
                     </button>
                   </li>
@@ -130,9 +111,7 @@ export default function PhoneInput({ value, onChange, required = false }: PhoneI
           type="tel"
           value={displayValue}
           onChange={handlePhoneChange}
-          className={`flex-1 p-3 bg-white dark:bg-gray-800 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
-            error ? 'border-red-500 dark:border-red-500' : ''
-          }`}
+          className="flex-1 min-w-0 h-[46px] px-3 sm:px-4 bg-white dark:bg-gray-800 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm sm:text-base"
           placeholder={selectedCountry.format}
           required={required}
         />
@@ -140,7 +119,7 @@ export default function PhoneInput({ value, onChange, required = false }: PhoneI
 
       {/* Error message */}
       {error && (
-        <p className="text-sm text-red-500 dark:text-red-400">
+        <p className="text-sm text-red-500 dark:text-red-400 mt-1">
           {error}
         </p>
       )}
