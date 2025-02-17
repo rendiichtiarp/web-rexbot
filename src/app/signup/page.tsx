@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import PhoneInput from '@/components/PhoneInput';
+import LoadingButton from '@/components/LoadingButton';
 
 export default function SignUp() {
   const [mounted, setMounted] = useState(false);
@@ -13,6 +14,7 @@ export default function SignUp() {
     birth_date: ''
   });
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -48,6 +50,7 @@ export default function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
       // Validasi umur
@@ -117,6 +120,8 @@ export default function SignUp() {
     } catch (error) {
       console.error('Error:', error);
       setMessage('Terjadi kesalahan pada server');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -210,12 +215,12 @@ export default function SignUp() {
                 </label>
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-black dark:bg-white text-white dark:text-black px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 hover:scale-[1.02] transition-all"
-              >
-                Daftar
-              </button>
+              <LoadingButton
+                isLoading={isLoading}
+                text="Daftar"
+                loadingText="Mendaftarkan..."
+                className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 hover:scale-[1.02]"
+              />
             </form>
 
             <div className="mt-6 text-center">

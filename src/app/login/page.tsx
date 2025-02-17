@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import PhoneInput from '@/components/PhoneInput';
+import LoadingButton from '@/components/LoadingButton';
 
 type LoginStep = 'INPUT_USER' | 'INPUT_OTP';
 
@@ -15,6 +16,7 @@ export default function Login() {
     otp: ''
   });
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -22,6 +24,7 @@ export default function Login() {
 
   const handleRequestOTP = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
       // Validasi nomor
@@ -58,6 +61,8 @@ export default function Login() {
     } catch (error) {
       console.error('Error:', error);
       setMessage('Terjadi kesalahan pada server');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -140,12 +145,12 @@ export default function Login() {
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-black dark:bg-white text-white dark:text-black px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 hover:scale-[1.02] transition-all"
-                >
-                  Kirim OTP
-                </button>
+                <LoadingButton
+                  isLoading={isLoading}
+                  text="Kirim OTP"
+                  loadingText="Mengirim OTP..."
+                  className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 hover:scale-[1.02]"
+                />
               </form>
             ) : (
               <form onSubmit={handleVerifyOTP} className="space-y-6">
